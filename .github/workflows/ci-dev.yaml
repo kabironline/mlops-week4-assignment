@@ -24,21 +24,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Create __init__.py files
-      run: |
-        touch src/__init__.py
-        touch tests/__init__.py
-    
     - name: Verify data exists
       run: |
         echo "Checking for data files..."
         ls -la data/
-        ls -la week3/feature_store/ || echo "Week3 feature store not found"
-    
-    - name: Train model
-      run: |
-        python src/train.py
-    
+
     - name: Run Data Validation Tests
       run: |
         echo "========================================="
