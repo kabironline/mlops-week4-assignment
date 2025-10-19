@@ -60,6 +60,6 @@ def test_prediction_probabilities(trained_model):
     # Get probability predictions
     probas = trained_model.predict_proba(X[:10])
     
-    assert probas.shape == (10, 3), "Probability predictions have wrong shape"
+    assert probas.shape == (10, 2), "Probability predictions have wrong shape"
     assert (probas >= 0).all() and (probas <= 1).all(), "Probabilities outside [0,1] range"
     assert abs(probas.sum(axis=1) - 1).max() < 1e-6, "Probabilities don't sum to 1"
