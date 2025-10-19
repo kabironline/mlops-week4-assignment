@@ -1,0 +1,4 @@
+[core]
+    remote = myremote
+['remote "myremote"']
+    url = gs://mystical-atlas-473806-i7-week4/iris-pipeline
