@@ -46,6 +46,10 @@ jobs:
         echo "========================================="
         pytest tests/test_data_validation.py -v
     
+    - name: Train model
+      run: |
+        python src/train.py
+    
     - name: Run Evaluation Tests
       run: |
         echo "========================================="
