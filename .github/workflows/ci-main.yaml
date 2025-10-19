@@ -24,22 +24,31 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Setup DVC
+    - name: Create __init__.py files
       run: |
-        dvc remote list
+        touch src/__init__.py
+        touch tests/__init__.py
     
-    - name: Pull DVC tracked files
+    - name: Verify data exists
       run: |
-        dvc pull || echo "No DVC files to pull yet"
+        echo "Checking for data files..."
+        ls -la data/
+        ls -la week3/feature_store/ || echo "Week3 feature store not found"
     
-    - name: Train model if not exists
+    - name: Train model
       run: |
         python src/train.py
     
     - name: Run Data Validation Tests
       run: |
+        echo "========================================="
+        echo "Running Data Validation Tests"
+        echo "========================================="
         pytest tests/test_data_validation.py -v
     
     - name: Run Evaluation Tests
       run: |
+        echo "========================================="
+        echo "Running Evaluation Tests"
+        echo "========================================="
         pytest tests/test_evaluation.py -v
