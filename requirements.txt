@@ -2,5 +2,4 @@ scikit-learn
 pandas
 numpy
 pytest
-dvc
-dvc[gs]
+mlflow==3.5.1

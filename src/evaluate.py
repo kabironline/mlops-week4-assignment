@@ -1,54 +1,45 @@
-import pickle
+import mlflow
+import mlflow.pyfunc
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-import os
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from sklearn.preprocessing import LabelEncoder
 
-def load_model(model_path='models/iris_model.pkl'):
-    """Load trained model"""
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(f"Model not found at {model_path}")
-    
-    with open(model_path, 'rb') as f:
-        return pickle.load(f)
+# The MLFlow tracking URI will be picked up from the MLFLOW_TRACKING_URI environment variable.
 
-def load_data():
-    """Load IRIS data from Week 3 feast setup"""
-    data_path = 'data/iris.csv'
-    df = pd.read_csv(data_path)
-    return df
+print(f"MLFlow Tracking URI: {mlflow.get_tracking_uri()}")
 
 def evaluate_model():
-    """Evaluate model performance"""
-    # Load model and data
-    model = load_model()
-    df = load_data()
-    
-    # Prepare features and target
-    feature_cols = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
-    X = df[feature_cols]
-    y = df['species']
-    
-    # Split data (same split as training)
+    # 1. Fetch the latest/best model from MLFlow Model Registry
+    # You can specify a stage (e.g., "Production", "Staging") or "latest" version
+    model_name = "LogisticRegressionModel"
+    # For simplicity, we'll fetch the latest version.
+    # In a real scenario, you might fetch a model in a specific stage like "Production"
+    model_uri = f"models:/{model_name}/latest"
+
+    print(f"Fetching model from MLFlow Model Registry: {model_uri}")
+    model = mlflow.pyfunc.load_model(model_uri)
+    print("Model loaded successfully.")
+
+    # 2. Prepare Evaluation Data from iris.csv
+    data_path = "data/iris.csv"
+    print(f"Loading evaluation data from {data_path}")
+    df = pd.read_csv(data_path)
+
+    X = df.drop("species", axis=1)
+    y_raw = df["species"]
+
+    le = LabelEncoder()
+    y = le.fit_transform(y_raw)
+
     _, X_test, _, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
-    
-    # Make predictions
-    predictions = model.predict(X_test)
-    accuracy = accuracy_score(y_test, predictions)
-    
-    # Print results
-    print("="*50)
-    print("MODEL EVALUATION REPORT")
-    print("="*50)
-    print(f"\nAccuracy: {accuracy:.4f}")
-    print("\nClassification Report:")
-    print(classification_report(y_test, predictions))
-    print("\nConfusion Matrix:")
-    print(confusion_matrix(y_test, predictions))
-    
-    return accuracy, y_test, predictions
+
+    # 3. Evaluate the model
+    y_pred = model.predict(X_test)
+    print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
+    print(f"F1 Score (Weighted): {f1_score(y_test, y_pred, average='weighted'):.4f}")
 
 if __name__ == "__main__":
     evaluate_model()
