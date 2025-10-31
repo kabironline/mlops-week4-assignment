@@ -2,4 +2,4 @@ scikit-learn
 pandas
 numpy
 pytest
-mlflow==3.5.1
+mlflow
